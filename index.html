@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متابعة بطاقات H2S – FBU-14</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--text:#1b2733;--muted:#6b7a89;--line:#e3e8ee;--brand:#0f5c8c;--ok:#1e8e5a;--okbg:#e2f5ec;--warn:#b86e00;--warnbg:#fff1d6;--bad:#c62828;--badbg:#fde4e4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161d;--card:#18212b;--text:#e8eef4;--muted:#93a2b1;--line:#2a3643;--brand:#4aa3d8;--ok:#4cc98d;--okbg:#14382a;--warn:#f0b04a;--warnbg:#3d2d0e;--bad:#ff7b7b;--badbg:#431a1a}}
+:root[data-theme="dark"]{--bg:#10161d;--card:#18212b;--text:#e8eef4;--muted:#93a2b1;--line:#2a3643;--brand:#4aa3d8;--ok:#4cc98d;--okbg:#14382a;--warn:#f0b04a;--warnbg:#3d2d0e;--bad:#ff7b7b;--badbg:#431a1a}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Tajawal',Tahoma,Arial,sans-serif;padding:16px}
+.wrap{max-width:900px;margin:auto}
+header{background:var(--brand);color:#fff;border-radius:16px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{margin:0;font-size:20px}
+header p{margin:4px 0 0;font-size:13px;opacity:.9}
+.badge{background:rgba(255,255,255,.2);padding:6px 14px;border-radius:999px;font-weight:700;font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:12px;color:var(--muted)}
+.s-ok b{color:var(--ok)}.s-warn b{color:var(--warn)}.s-bad b{color:var(--bad)}
+.add{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;grid-template-columns:2fr 1.2fr 1.2fr auto;gap:8px;margin-bottom:14px}
+input{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-width:0}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;background:var(--brand);color:#fff;font-weight:700}
+button.ghost{background:transparent;color:var(--bad);padding:6px 10px;font-size:18px}
+.tools{display:flex;gap:8px;margin-bottom:10px}
+.tools button{background:var(--card);color:var(--text);border:1px solid var(--line);font-weight:500;font-size:13px}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{background:var(--bg);color:var(--muted);font-size:13px;font-weight:700;text-align:right;padding:12px;border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);font-size:15px}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.p-ok{background:var(--okbg);color:var(--ok)}.p-warn{background:var(--warnbg);color:var(--warn)}.p-bad{background:var(--badbg);color:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:24px}
+@media (max-width:600px){.add{grid-template-columns:1fr 1fr}.add input:first-child,.add button{grid-column:1/-1}}
+@media print{.add,.tools,.ghost{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>متابعة بطاقات H2S</h1><p>تاريخ انتهاء البطاقات لموظفي الوحدة</p></div>
+  <div class="badge">FBU - 14</div>
+</header>
+<div class="stats">
+  <div class="stat s-ok"><b id="cOk">0</b><span>سارية</span></div>
+  <div class="stat s-warn"><b id="cWarn">0</b><span>تنتهي خلال 30 يوم</span></div>
+  <div class="stat s-bad"><b id="cBad">0</b><span>منتهية</span></div>
+</div>
+<div class="add">
+  <input id="name" placeholder="اسم الموظف">
+  <input id="card" placeholder="رقم البطاقة (اختياري)">
+  <input id="exp" type="date" aria-label="تاريخ الانتهاء">
+  <button id="addBtn">+ إضافة</button>
+</div>
+<div class="tools">
+  <button id="sortBtn">ترتيب حسب الانتهاء</button>
+  <button onclick="window.print()">طباعة</button>
+</div>
+<div class="tbl">
+<table>
+  <thead><tr><th>#</th><th>اسم الموظف</th><th>رقم البطاقة</th><th>تاريخ الانتهاء</th><th>المتبقي</th><th>الحالة</th><th></th></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+</div>
+</div>
+<script>
+var KEY='fbu14-h2s', rows=[];
+function load(){try{var s=localStorage.getItem(KEY);if(s)rows=JSON.parse(s)}catch(e){}
+  if(!rows.length){var d=function(n){var t=new Date();t.setDate(t.getDate()+n);return t.toISOString().slice(0,10)};
+    rows=[{n:'اسم الموظف 1',c:'H2S-001',e:d(200)},{n:'اسم الموظف 2',c:'H2S-002',e:d(15)},{n:'اسم الموظف 3',c:'H2S-003',e:d(-10)}]}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(rows))}catch(e){}}
+function days(e){var a=new Date();a.setHours(0,0,0,0);return Math.round((new Date(e+'T00:00:00')-a)/864e5)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function render(){
+  var ok=0,w=0,b=0,h='';
+  rows.forEach(function(r,i){var d=days(r.e),cls,t,rem;
+    if(d<0){cls='p-bad';t='منتهية';b++;rem='منذ '+(-d)+' يوم'}
+    else if(d<=30){cls='p-warn';t='قاربت على الانتهاء';w++;rem=d+' يوم'}
+    else{cls='p-ok';t='سارية';ok++;rem=d+' يوم'}
+    h+='<tr><td>'+(i+1)+'</td><td><b>'+esc(r.n)+'</b></td><td>'+esc(r.c||'—')+'</td><td>'+r.e+'</td><td>'+rem+'</td><td><span class="pill '+cls+'">'+t+'</span></td><td><button class="ghost" onclick="del('+i+')" aria-label="حذف">✕</button></td></tr>'});
+  document.getElementById('rows').innerHTML=h||'<tr><td colspan="7" class="empty">لا توجد بيانات، أضف أول موظف</td></tr>';
+  document.getElementById('cOk').textContent=ok;document.getElementById('cWarn').textContent=w;document.getElementById('cBad').textContent=b}
+function del(i){rows.splice(i,1);save();render()}
+document.getElementById('addBtn').onclick=function(){
+  var n=document.getElementById('name').value.trim(),c=document.getElementById('card').value.trim(),e=document.getElementById('exp').value;
+  if(!n||!e){alert('أدخل الاسم وتاريخ الانتهاء');return}
+  rows.push({n:n,c:c,e:e});save();render();
+  ['name','card','exp'].forEach(function(id){document.getElementById(id).value=''})};
+document.getElementById('sortBtn').onclick=function(){rows.sort(function(a,b){return a.e<b.e?-1:1});save();render()};
+load();render();
+</script>
+</body>
+</html>
